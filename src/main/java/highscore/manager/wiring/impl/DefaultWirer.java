@@ -34,11 +34,8 @@ public class DefaultWirer implements Wirer<HighscoreManagerHttpServer> {
 		String httpServerHost = configuration.get("http.server.host");
 		int httpServerPort = Integer.parseInt(configuration.get("http.server.port"));
 		String httpServerUrlRoot = configuration.get("http.server.url.root");
-		int httpServerMaxThreadCount = Integer.parseInt(configuration.get("http.server.max.thread.count"));
-		if(httpServerMaxThreadCount <= 0) {
-			httpServerMaxThreadCount = Runtime.getRuntime().availableProcessors();
-			System.out.println("httpServerMaxThreadCount set to " + httpServerMaxThreadCount);
-		}
+		int cpuCount = Runtime.getRuntime().availableProcessors();
+		System.out.println("cpuCount set to " + cpuCount);
 		String httpServerResponseEncoding = configuration.get("http.server.response.encoding");
 		int highscoresMaxPerLevel = Integer.parseInt(configuration.get("highscores.max.per.level"));
 		boolean highscoresUseLockStriping = Boolean.parseBoolean(configuration.get("highscores.use.lock.striping"));
@@ -49,7 +46,7 @@ public class DefaultWirer implements Wirer<HighscoreManagerHttpServer> {
 
 		HighscoreService highscoreService;
 		if(highscoresUseLockStriping) {
-			highscoreService = new LockStripingHighscoreServiceImpl(highscoreServiceIntHashMapFactory, httpServerMaxThreadCount);
+			highscoreService = new LockStripingHighscoreServiceImpl(highscoreServiceIntHashMapFactory, cpuCount);
 		} else {
 			highscoreService = new HighscoreServiceImpl(highscoreServiceIntHashMapFactory);
 		}
@@ -74,7 +71,7 @@ public class DefaultWirer implements Wirer<HighscoreManagerHttpServer> {
 		HighscoreManagerHttpHandler highscoreManagerHttpHandler = new HighscoreManagerHttpHandler(defaultController, 
 				loginController, highscoreUpdateController, highscoreReportController, statsController);
 		
-		HighscoreManagerHttpServer highscoreManagerHttpServer = new HighscoreManagerHttpServer(httpServerHost, httpServerPort, httpServerUrlRoot, highscoreManagerHttpHandler, 8);
+		HighscoreManagerHttpServer highscoreManagerHttpServer = new HighscoreManagerHttpServer(httpServerHost, httpServerPort, httpServerUrlRoot, highscoreManagerHttpHandler);
 		
 		return highscoreManagerHttpServer;
 	}

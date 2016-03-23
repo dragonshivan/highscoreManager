@@ -51,7 +51,7 @@ public class IntegrationTestWirer implements Wirer<HighscoreManagerHttpServer> {
 		HighscoreManagerHttpHandler highscoreManagerHttpHandler = new HighscoreManagerHttpHandler(defaultController, 
 				loginController, highscoreUpdateController, highscoreReportController);
 		
-		HighscoreManagerHttpServer highscoreManagerHttpServer = new HighscoreManagerHttpServer("localhost", 8888, "/", highscoreManagerHttpHandler, 8);
+		HighscoreManagerHttpServer highscoreManagerHttpServer = new HighscoreManagerHttpServer("localhost", 8888, "/", highscoreManagerHttpHandler);
 		
 		return highscoreManagerHttpServer;
 	}

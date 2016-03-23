@@ -13,21 +13,19 @@ public class HighscoreManagerHttpServer {
 	private final int port;
 	private final String rootURL;
 	private final HttpHandler httpHandler;
-	private final int maxThreadCount;
 	private HttpServer server;
 	
-	public HighscoreManagerHttpServer(String host, int port, String rootURL, HttpHandler httpHandler, int maxThreadCount) {
+	public HighscoreManagerHttpServer(String host, int port, String rootURL, HttpHandler httpHandler) {
 		this.host = host;
 		this.port = port;
 		this.rootURL = rootURL;
 		this.httpHandler = httpHandler;
-		this.maxThreadCount = maxThreadCount;
 	}
 	
 	public void start() throws IOException {
 		InetSocketAddress address = new InetSocketAddress(host, port);
 		server = HttpServer.create(address, 0);
-	    server.setExecutor(Executors.newFixedThreadPool(maxThreadCount));	    
+	    server.setExecutor(Executors.newCachedThreadPool());
 	    server.createContext(rootURL, httpHandler);	    
 	    server.start();
 	    System.out.println("started on " + address + rootURL);

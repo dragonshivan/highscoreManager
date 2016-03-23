@@ -80,4 +80,22 @@ public class SessionManagementServiceImplTest {
 		assertThat(user, equalTo(SessionManagementService.SYNTACTICALLY_INVALID_SESSION_KEY));
 	}
 	
+	@Test
+	public void WHEN_11_minutes_pass_THEN_old_sessions_generation_is_removed() {
+		sessionManagementService.getNewSessionId(123);
+		assertThat(sessionManagementService.getStats().getGenerationsCount(), equalTo(1));
+		sessionManagementService.setTimeAdvancement(11);
+		sessionManagementService.getNewSessionId(456);
+		assertThat(sessionManagementService.getStats().getGenerationsCount(), equalTo(1));
+	}
+	
+	@Test
+	public void WHEN_9_minutes_pass_THEN_old_sessions_generation_is_not_removed() {
+		sessionManagementService.getNewSessionId(123);
+		assertThat(sessionManagementService.getStats().getGenerationsCount(), equalTo(1));
+		sessionManagementService.setTimeAdvancement(9);
+		sessionManagementService.getNewSessionId(456);
+		assertThat(sessionManagementService.getStats().getGenerationsCount(), equalTo(2));
+	}
+	
 }

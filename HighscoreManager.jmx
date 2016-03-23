@@ -11,7 +11,7 @@
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
     <hashTree>
-      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="Random user 0-10000" enabled="true">
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="Random user 0-10 000" enabled="true">
         <stringProp name="maximumValue">10000</stringProp>
         <stringProp name="minimumValue">0</stringProp>
         <stringProp name="outputFormat"></stringProp>
@@ -20,11 +20,11 @@
         <stringProp name="variableName">random_user</stringProp>
       </RandomVariableConfig>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="20 threads: each does:  450x of ( login + 20x score for random level and score + 20x highscorelist for random level)" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="20 threads: each does:  2000x of ( login + 200x score for random level and score + 20x highscorelist for random level)" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">450</stringProp>
+          <stringProp name="LoopController.loops">2000</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">20</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
@@ -81,12 +81,12 @@
           </RegexExtractor>
           <hashTree/>
         </hashTree>
-        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="20x highscore reads &amp; writes   " enabled="true">
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="200x highscore reads &amp; writes   " enabled="true">
           <boolProp name="LoopController.continue_forever">true</boolProp>
-          <stringProp name="LoopController.loops">20</stringProp>
+          <stringProp name="LoopController.loops">200</stringProp>
         </LoopController>
         <hashTree>
-          <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="Random level 0 - 100000" enabled="true">
+          <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="Random level 0 - 100 000" enabled="true">
             <stringProp name="maximumValue">100000</stringProp>
             <stringProp name="minimumValue">0</stringProp>
             <stringProp name="outputFormat"></stringProp>

@@ -139,7 +139,7 @@ public class SessionManagementServiceImpl implements SessionManagementService {
 	}
 	
 	private void removeExpiredSessionsIfAny() {
-		if(getMinutesFromServerStart() - lastSessionCleanUpAsMinutesFromServerStart < sessionTimeoutMinutes) {
+		if(getMinutesFromServerStart() - lastSessionCleanUpAsMinutesFromServerStart < 1) {
 			return;
 		}
 		Iterator<Map.Entry<Integer, IntHashMap>> it = sessionsPerStartTimeAsMinutesFromServerStart.entrySet().iterator();
