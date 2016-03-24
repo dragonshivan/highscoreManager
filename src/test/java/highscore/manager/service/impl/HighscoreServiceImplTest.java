@@ -14,7 +14,7 @@ import highscore.manager.service.datastructure.impl.CappedIntHashMapFactory;
 
 public class HighscoreServiceImplTest {
 
-	private HighscoreService highscoreService; 
+	private HighscoreService<IntHeap> highscoreService; 
 	
 	@Before
 	public void init() {

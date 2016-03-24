@@ -1,8 +1,7 @@
 package highscore.manager.service;
 
-import highscore.manager.service.datastructure.IntHeap;
+@FunctionalInterface
+public interface HighscoresFormatterService<T> {
 
-public interface HighscoresFormatterService {
-
-	String format(IntHeap highscores);
+	String format(T highscores);
 }

@@ -35,17 +35,17 @@ public class HighscoreServiceImplIntegrationTest {
 	@Test
 	public void WHEN_multiple_threads_read_and_update_random_highscores_on_same_level_THEN_no_error() {
 		//when
-		Supplier<HighscoreService> context = () -> {
+		Supplier<HighscoreService<IntHeap>> context = () -> {
 			return new HighscoreServiceImpl(new CappedIntHashMapFactory((byte)15));
 		};
-		ActorAction<HighscoreService, Void> read = (highscoreService) -> {
+		ActorAction<HighscoreService<IntHeap>, Void> read = (highscoreService) -> {
 			for(int i = 0; i < 100_000; i++) {
 				highscoreService.getSortedHighscores(1);
 			}
 			return null;
 		};
 		
-		ActorAction<HighscoreService, Void> update = (highscoreService) -> {
+		ActorAction<HighscoreService<IntHeap>, Void> update = (highscoreService) -> {
 			for(int i = 0; i < 100_000; i++) {
 				highscoreService.update(1, ThreadLocalRandom.current().nextInt(5000), ThreadLocalRandom.current().nextInt(5000));
 			}
@@ -60,14 +60,14 @@ public class HighscoreServiceImplIntegrationTest {
 	@Test
 	public void WHEN_multiple_threads_update_certain_highscores_on_same_level_THEN_only_those_values_are_read() {
 		//when
-		Supplier<HighscoreService> context = () -> {
+		Supplier<HighscoreService<IntHeap>> context = () -> {
 			return new HighscoreServiceImpl(new CappedIntHashMapFactory((byte)15));
 		};
-		ActorAction<HighscoreService, IntHeap> read = (highscoreService) -> {
+		ActorAction<HighscoreService<IntHeap>, IntHeap> read = (highscoreService) -> {
 			return highscoreService.getSortedHighscores(1);
 		};
 		
-		ActorAction<HighscoreService, Void> update = (highscoreService) -> {
+		ActorAction<HighscoreService<IntHeap>, Void> update = (highscoreService) -> {
 			highscoreService.update(1, 1, 11);
 			highscoreService.update(1, 1, 12);
 			highscoreService.update(1, 2, 21);
@@ -99,18 +99,18 @@ public class HighscoreServiceImplIntegrationTest {
 	@Test
 	public void WHEN_update_is_ongoing_THEN_read_waits_for_it_to_finish() {
 		//when
-		Supplier<HighscoreService> context = () -> {
-			HighscoreService highscoreService = new HighscoreServiceImpl(new SlowWriteCappedIntHashMapFactory((byte)15));
+		Supplier<HighscoreService<IntHeap>> context = () -> {
+			HighscoreService<IntHeap> highscoreService = new HighscoreServiceImpl(new SlowWriteCappedIntHashMapFactory((byte)15));
 			highscoreService.update(1, 11, 111);
 			return highscoreService;
 		};
-		ActorAction<HighscoreService, IntHeap> read = (highscoreService) -> {
+		ActorAction<HighscoreService<IntHeap>, IntHeap> read = (highscoreService) -> {
 			ActorAction.waitForOverlapWithSlowThread();
 			IntHeap highscores = highscoreService.getSortedHighscores(1);
 			highscores = highscoreService.getSortedHighscores(1);
 			return highscores;
 		};
-		ActorAction<HighscoreService, Void> update = (highscoreService) -> {
+		ActorAction<HighscoreService<IntHeap>, Void> update = (highscoreService) -> {
 			highscoreService.update(1, 11, 333);
 			return null;
 		};
@@ -127,16 +127,16 @@ public class HighscoreServiceImplIntegrationTest {
 	@Test
 	public void WHEN_read_is_ongoing_THEN_update_waits_for_it_to_finish() {
 		//when
-		Supplier<HighscoreService> context = () -> {
-			HighscoreService highscoreService = new HighscoreServiceImpl(new SlowStreamCappedIntHashMapFactory((byte)15));
+		Supplier<HighscoreService<IntHeap>> context = () -> {
+			HighscoreService<IntHeap> highscoreService = new HighscoreServiceImpl(new SlowStreamCappedIntHashMapFactory((byte)15));
 			highscoreService.update(1, 11, 111);
 			return highscoreService;
 		};
-		ActorAction<HighscoreService, IntHeap> read = (highscoreService) -> {
+		ActorAction<HighscoreService<IntHeap>, IntHeap> read = (highscoreService) -> {
 			IntHeap highscores = highscoreService.getSortedHighscores(1);
 			return highscores;
 		};
-		ActorAction<HighscoreService, Void> update = (highscoreService) -> {
+		ActorAction<HighscoreService<IntHeap>, Void> update = (highscoreService) -> {
 			ActorAction.waitForOverlapWithSlowThread();
 			highscoreService.update(1, 11, 333);
 			return null;

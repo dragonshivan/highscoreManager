@@ -17,12 +17,12 @@ public class HighscoreUpdateControllerImpl extends AbstractController {
 	private static final String USER_ID_ATTR = HighscoreUpdateControllerImpl.class.getSimpleName() + "_" + "USER_ID_ATTR";
 	private static final String SCORE_ATTR = HighscoreUpdateControllerImpl.class.getSimpleName() + "_" + "SCORE_ATTR";
 	
-	private final HighscoreService highscoreService;
+	private final HighscoreService<?> highscoreService;
 	private final SessionManagementService sessionManagementService;
 
 	public HighscoreUpdateControllerImpl(Charset responseEncoding, HttpMethod matchingHttpMethod,
 			String matchingRequestURIRegEx,
-			HighscoreService highscoreService,
+			HighscoreService<?> highscoreService,
 			SessionManagementService sessionManagementService) {
 		super(responseEncoding, matchingHttpMethod, matchingRequestURIRegEx);
 		this.highscoreService = highscoreService;

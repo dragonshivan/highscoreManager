@@ -3,7 +3,7 @@ package highscore.manager.service.impl;
 import highscore.manager.service.HighscoresFormatterService;
 import highscore.manager.service.datastructure.IntHeap;
 
-public class HighscoresFormatterServiceImpl implements HighscoresFormatterService {
+public class HighscoresFormatterServiceImpl implements HighscoresFormatterService<IntHeap> {
 	
 	private final String valuesSeparator;
 	private final String linesSeparator;

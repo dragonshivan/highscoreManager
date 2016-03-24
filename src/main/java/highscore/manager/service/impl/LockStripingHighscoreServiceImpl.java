@@ -10,7 +10,7 @@ import highscore.manager.service.datastructure.IntHashMapFactory;
 import highscore.manager.service.datastructure.IntHeap;
 import highscore.manager.service.datastructure.impl.MaxIntHeap;
 
-public class LockStripingHighscoreServiceImpl implements HighscoreService {
+public class LockStripingHighscoreServiceImpl implements HighscoreService<IntHeap> {
 	private Map<Integer, IntHashMap> highscoresPerLevel;
 	
 	private final IntHashMapFactory intHashMapFactory;

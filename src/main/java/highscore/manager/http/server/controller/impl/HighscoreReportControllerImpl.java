@@ -6,19 +6,18 @@ import java.nio.charset.Charset;
 import highscore.manager.http.server.controller.AbstractController;
 import highscore.manager.service.HighscoreService;
 import highscore.manager.service.HighscoresFormatterService;
-import highscore.manager.service.datastructure.IntHeap;
 
-public class HighscoreReportControllerImpl extends AbstractController {
+public class HighscoreReportControllerImpl<T> extends AbstractController {
 	
 	private static final String LEVEL_ID_ATTR = HighscoreReportControllerImpl.class.getSimpleName() + "_" + "LEVEL_ID_ATTR";
 	
-	private final HighscoreService highscoreService;
-	private final HighscoresFormatterService highscoresFormatterService;
+	private final HighscoreService<T> highscoreService;
+	private final HighscoresFormatterService<T> highscoresFormatterService;
 
 	public HighscoreReportControllerImpl(Charset responseEncoding,
 			HttpMethod matchingHttpMethod, String matchingRequestURIRegEx,
-			HighscoreService highscoreService,
-			HighscoresFormatterService highscoresFormatterService) {
+			HighscoreService<T> highscoreService,
+			HighscoresFormatterService<T> highscoresFormatterService) {
 		super(responseEncoding, matchingHttpMethod, matchingRequestURIRegEx);
 		this.highscoreService = highscoreService;
 		this.highscoresFormatterService = highscoresFormatterService;
@@ -37,7 +36,7 @@ public class HighscoreReportControllerImpl extends AbstractController {
 	@Override
 	public String getResponseBody(HttpRequest request) {
 		Integer levelId = request.getAttribute(LEVEL_ID_ATTR);
-		IntHeap highscores = highscoreService.getSortedHighscores(levelId);
+		T highscores = highscoreService.getSortedHighscores(levelId);
 		return highscoresFormatterService.format(highscores);
 	}
 	

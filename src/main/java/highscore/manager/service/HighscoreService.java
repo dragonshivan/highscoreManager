@@ -1,12 +1,10 @@
 package highscore.manager.service;
 
-import highscore.manager.service.datastructure.IntHeap;
+public interface HighscoreService<R> {
 
-public interface HighscoreService {
-
-	public void update(int level, int user, int score);
-	public IntHeap getSortedHighscores(int level);
-	public HighscoreStats getStats();
+	void update(int level, int user, int score);
+	R getSortedHighscores(int level);
+	HighscoreStats getStats();
 	
 	public static class HighscoreStats {
 		private final int levelsCount;

@@ -9,12 +9,12 @@ import highscore.manager.service.SessionManagementService;
 public class StatsControllerImpl extends AbstractController {
 	
 	private final SessionManagementService sessionManagementService;
-	private final HighscoreService highscoreService;
+	private final HighscoreService<?> highscoreService;
 	
 	public StatsControllerImpl(Charset responseEncoding, 
 			HttpMethod matchingHttpMethod, String matchingRequestURIRegEx,
 			SessionManagementService sessionManagementService,
-			HighscoreService highscoreService) {
+			HighscoreService<?> highscoreService) {
 		super(responseEncoding, matchingHttpMethod, matchingRequestURIRegEx);
 		this.sessionManagementService = sessionManagementService;
 		this.highscoreService = highscoreService;

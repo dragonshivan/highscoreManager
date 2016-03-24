@@ -17,6 +17,7 @@ import highscore.manager.service.HighscoreService;
 import highscore.manager.service.HighscoresFormatterService;
 import highscore.manager.service.SessionManagementService;
 import highscore.manager.service.datastructure.IntHashMapFactory;
+import highscore.manager.service.datastructure.IntHeap;
 import highscore.manager.service.datastructure.impl.CappedIntHashMapFactory;
 import highscore.manager.service.datastructure.impl.ExpandableIntHashMapFactory;
 import highscore.manager.service.impl.EncodedSessionKeyServiceImpl;
@@ -31,8 +32,7 @@ public class IntegrationTestWirer implements Wirer<HighscoreManagerHttpServer> {
 	public HighscoreManagerHttpServer wire(Map<String, String> configuration) {
 		IntHashMapFactory highscoreServiceIntHashMapFactory = new CappedIntHashMapFactory((byte)15);
 		
-		//TODO lockPoolCount = threadPoolCount
-		HighscoreService highscoreService = new HighscoreServiceImpl(highscoreServiceIntHashMapFactory);
+		HighscoreService<IntHeap> highscoreService = new HighscoreServiceImpl(highscoreServiceIntHashMapFactory);
 		
 		IntHashMapFactory encodedSessionKeyServiceIntHashMapFactory = new ExpandableIntHashMapFactory(10, 8);
 		EncodedSessionKeyService encodedSessionKeyService = new EncodedSessionKeyServiceImpl();
@@ -44,8 +44,8 @@ public class IntegrationTestWirer implements Wirer<HighscoreManagerHttpServer> {
 		Controller loginController = new LoginControllerImpl(charset, HttpMethod.GET, ".*/[0-9]{0,10}/login", sessionManagementService);
 		Controller highscoreUpdateController = new HighscoreUpdateControllerImpl(charset, HttpMethod.POST, ".*/[0-9]{0,10}/score\\?sessionkey=[A-Z0-9]{6}",
 				highscoreService, sessionManagementService);
-		HighscoresFormatterService highscoresFormatterService = new HighscoresFormatterServiceImpl("=", ",");
-		Controller highscoreReportController = new HighscoreReportControllerImpl(charset, HttpMethod.GET, ".*/[0-9]{0,10}/highscorelist", 
+		HighscoresFormatterService<IntHeap> highscoresFormatterService = new HighscoresFormatterServiceImpl("=", ",");
+		Controller highscoreReportController = new HighscoreReportControllerImpl<IntHeap>(charset, HttpMethod.GET, ".*/[0-9]{0,10}/highscorelist", 
 				highscoreService, highscoresFormatterService);
 		
 		HighscoreManagerHttpHandler highscoreManagerHttpHandler = new HighscoreManagerHttpHandler(defaultController, 
