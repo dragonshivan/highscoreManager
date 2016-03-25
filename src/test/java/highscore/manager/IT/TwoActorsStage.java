@@ -131,30 +131,18 @@ public class TwoActorsStage {
 		}
 		
 		public boolean hasStartedBefore(ActionResult<?> otherAction) {
-			if(startTimeNano <= otherAction.getStartTimeNano()) {
-				return true;
-			}
 			return startTimeNano <= otherAction.getStartTimeNano();
 		}
 		
 		public boolean hasFinishedAfter(ActionResult<?> otherAction) {
-			if(endTimeNano >= otherAction.getEndTimeNano()) {
-				return true;
-			}
 			return endTimeNano >= otherAction.getEndTimeNano();
 		}
 		
 		public boolean hasStartedAfter(ActionResult<?> otherAction) {
-			if(startTimeNano >= otherAction.getStartTimeNano()) {
-				return true;
-			}
 			return startTimeNano >= otherAction.getStartTimeNano();
 		}
 		
 		public boolean hasFinishedBefore(ActionResult<?> otherAction) {
-			if(endTimeNano <= otherAction.getEndTimeNano()) {
-				return true;
-			}
 			return endTimeNano <= otherAction.getEndTimeNano();
 		}
 		
@@ -169,14 +157,18 @@ public class TwoActorsStage {
 			return (
 					( hasStartedBefore(otherAction) && hasFinishedAfter(otherAction) ) || // ---[S1---{S2---E2}---E1]---
 					( hasStartedAfter(otherAction) && hasFinishedBefore(otherAction) ) || // ---{S2---[S1---E1]---E2}---
-							( hasStartedBefore(otherAction) && getDurationNano() > otherAction.getStartTimeNano() - startTimeNano ) || // ---[S1-{S2--E1]-------
-									( hasStartedAfter(otherAction) && getDurationNano() > otherAction.getEndTimeNano() - startTimeNano ) // ---{S2---[S1---E2}--------
+							( hasStartedBefore(otherAction) && getDurationNano() > getDuration(otherAction.getStartTimeNano(), startTimeNano) ) || // ---[S1-{S2--E1]-------
+									( hasStartedAfter(otherAction) && getDurationNano() > getDuration(otherAction.getEndTimeNano(), startTimeNano) ) // ---{S2---[S1---E2}--------
 					);				
 		}
 		
 		@Override
 		public String toString() {
 			return returnedValue + " Start: " + startTimeNano + " End: " + endTimeNano;
+		}
+		
+		private static long getDuration(long endTime, long startTime) {
+			return endTime - startTime;
 		}
 	}
 }

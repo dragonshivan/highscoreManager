@@ -1,22 +1,20 @@
 package highscore.manager.service.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import highscore.manager.service.HighscoreService;
-import highscore.manager.service.impl.ReactiveHighscoreServiceImpl.Score;
-import rx.Observable;
+import highscore.manager.service.impl.ReactiveHighscoreServiceImpl.ScoreEntry;
 
-@Ignore("reactive implementation not done yet")
 public class ReactiveHighscoreServiceImplTest {
 
-	private HighscoreService<Observable<Score>> highscoreService; 
+	private HighscoreService<Stream<ScoreEntry>> highscoreService; 
 	
 	@Before
 	public void init() {
@@ -28,9 +26,8 @@ public class ReactiveHighscoreServiceImplTest {
 		highscoreService.update(1, 2, 15);
 		highscoreService.update(1, 2, 13);
 		highscoreService.update(1, 2, 16);
-		Observable<Score> highscores = highscoreService.getSortedHighscores(1);
-		List<Score> highscoresList = toList(highscores);
-		System.out.println(highscoresList);
+		Stream<ScoreEntry> highscores = highscoreService.getSortedHighscores(1);
+		List<ScoreEntry> highscoresList = highscores.collect(Collectors.toList());
 		assertEquals(1, highscoresList.size());
 		assertEquals(16, highscoresList.get(0).getScore());
 		assertEquals(2, highscoresList.get(0).getUser());
@@ -43,14 +40,15 @@ public class ReactiveHighscoreServiceImplTest {
 		highscoreService.update(1, 2, 16);
 		highscoreService.update(1, 3, 14);
 		highscoreService.update(1, 4, 15);
-//		Collection<int[]> highscores = toCollection(highscoreService.getSortedHighscores(1));
-//		assertEquals(3, highscores.size());
-//		assertEquals(2, highscores.stream().findFirst().get()[1]);
-//		assertEquals(16, highscores.stream().findFirst().get()[0]);
-//		assertEquals(4, highscores.stream().skip(1).findFirst().get()[1]);
-//		assertEquals(15, highscores.stream().skip(1).findFirst().get()[0]);
-//		assertEquals(3, highscores.stream().skip(2).findFirst().get()[1]);
-//		assertEquals(14, highscores.stream().skip(2).findFirst().get()[0]);
+		Stream<ScoreEntry> highscores = highscoreService.getSortedHighscores(1);
+		List<ScoreEntry> highscoresList = highscores.collect(Collectors.toList());
+		assertEquals(3, highscoresList.size());
+		assertEquals(2, highscoresList.stream().findFirst().get().getUser());
+		assertEquals(16, highscoresList.stream().findFirst().get().getScore());
+		assertEquals(4, highscoresList.stream().skip(1).findFirst().get().getUser());
+		assertEquals(15, highscoresList.stream().skip(1).findFirst().get().getScore());
+		assertEquals(3, highscoresList.stream().skip(2).findFirst().get().getUser());
+		assertEquals(14, highscoresList.stream().skip(2).findFirst().get().getScore());
 	}
 	
 	@Test
@@ -66,23 +64,25 @@ public class ReactiveHighscoreServiceImplTest {
 		highscoreService.update(2, 3, 14);
 		highscoreService.update(2, 4, 15);
 		
-//		Collection<int[]> highscores = toCollection(highscoreService.getSortedHighscores(1));
-//		assertEquals(3, highscores.size());
-//		assertEquals(2, highscores.stream().findFirst().get()[1]);
-//		assertEquals(16, highscores.stream().findFirst().get()[0]);
-//		assertEquals(4, highscores.stream().skip(1).findFirst().get()[1]);
-//		assertEquals(15, highscores.stream().skip(1).findFirst().get()[0]);
-//		assertEquals(3, highscores.stream().skip(2).findFirst().get()[1]);
-//		assertEquals(14, highscores.stream().skip(2).findFirst().get()[0]);
-//		
-//		highscores = toCollection(highscoreService.getSortedHighscores(2));
-//		assertEquals(3, highscores.size());
-//		assertEquals(2, highscores.stream().findFirst().get()[1]);
-//		assertEquals(16, highscores.stream().findFirst().get()[0]);
-//		assertEquals(4, highscores.stream().skip(1).findFirst().get()[1]);
-//		assertEquals(15, highscores.stream().skip(1).findFirst().get()[0]);
-//		assertEquals(3, highscores.stream().skip(2).findFirst().get()[1]);
-//		assertEquals(14, highscores.stream().skip(2).findFirst().get()[0]);
+		Stream<ScoreEntry> highscores = highscoreService.getSortedHighscores(1);
+		List<ScoreEntry> highscoresList = highscores.collect(Collectors.toList());
+		assertEquals(3, highscoresList.size());
+		assertEquals(2, highscoresList.stream().findFirst().get().getUser());
+		assertEquals(16, highscoresList.stream().findFirst().get().getScore());
+		assertEquals(4, highscoresList.stream().skip(1).findFirst().get().getUser());
+		assertEquals(15, highscoresList.stream().skip(1).findFirst().get().getScore());
+		assertEquals(3, highscoresList.stream().skip(2).findFirst().get().getUser());
+		assertEquals(14, highscoresList.stream().skip(2).findFirst().get().getScore());
+		
+		highscores = highscoreService.getSortedHighscores(2);
+		highscoresList = highscores.collect(Collectors.toList());
+		assertEquals(3, highscoresList.size());
+		assertEquals(2, highscoresList.stream().findFirst().get().getUser());
+		assertEquals(16, highscoresList.stream().findFirst().get().getScore());
+		assertEquals(4, highscoresList.stream().skip(1).findFirst().get().getUser());
+		assertEquals(15, highscoresList.stream().skip(1).findFirst().get().getScore());
+		assertEquals(3, highscoresList.stream().skip(2).findFirst().get().getUser());
+		assertEquals(14, highscoresList.stream().skip(2).findFirst().get().getScore());
 	}
 	
 	@Test
@@ -94,12 +94,13 @@ public class ReactiveHighscoreServiceImplTest {
 		highscoreService.update(1, 3, 3);
 		highscoreService.update(1, 3, 6);
 		
-//		Collection<int[]> highscores = toCollection(highscoreService.getSortedHighscores(1));
-//		assertEquals(2, highscores.size());
-//		assertEquals(16, highscores.stream().findFirst().get()[0]);
-//		assertEquals(2, highscores.stream().findFirst().get()[1]);
-//		assertEquals(6, highscores.stream().skip(1).findFirst().get()[0]);
-//		assertEquals(3, highscores.stream().skip(1).findFirst().get()[1]);
+		Stream<ScoreEntry> highscores = highscoreService.getSortedHighscores(1);
+		List<ScoreEntry> highscoresList = highscores.collect(Collectors.toList());
+		assertEquals(2, highscoresList.size());
+		assertEquals(16, highscoresList.stream().findFirst().get().getScore());
+		assertEquals(2, highscoresList.stream().findFirst().get().getUser());
+		assertEquals(6, highscoresList.stream().skip(1).findFirst().get().getScore());
+		assertEquals(3, highscoresList.stream().skip(1).findFirst().get().getUser());
 	}
 	
 	@Test
@@ -108,30 +109,26 @@ public class ReactiveHighscoreServiceImplTest {
 		highscoreService.update(1, 3, 30);
 		highscoreService.update(1, 4, 4);
 		
-//		Collection<int[]> highscores = toCollection(highscoreService.getSortedHighscores(1));
-//		assertEquals(3, highscores.size());
-//		assertEquals(30, highscores.stream().findFirst().get()[0]);
-//		assertEquals(3, highscores.stream().findFirst().get()[1]);
-//		assertEquals(15, highscores.stream().skip(1).findFirst().get()[0]);
-//		assertEquals(2, highscores.stream().skip(1).findFirst().get()[1]);
-//		assertEquals(4, highscores.stream().skip(2).findFirst().get()[0]);
-//		assertEquals(4, highscores.stream().skip(2).findFirst().get()[1]);
-//		
-//		highscoreService.update(1, 4, 44);
-//		
-//		highscores = toCollection(highscoreService.getSortedHighscores(1));
-//		assertEquals(3, highscores.size());
-//		assertEquals(44, highscores.stream().findFirst().get()[0]);
-//		assertEquals(4, highscores.stream().findFirst().get()[1]);
-//		assertEquals(30, highscores.stream().skip(1).findFirst().get()[0]);
-//		assertEquals(3, highscores.stream().skip(1).findFirst().get()[1]);
-//		assertEquals(15, highscores.stream().skip(2).findFirst().get()[0]);
-//		assertEquals(2, highscores.stream().skip(2).findFirst().get()[1]);
-	}
-	
-	private List<Score> toList(Observable<Score> highscores) {
-		List<Score> highscoresList = new ArrayList<>();
-		highscores.subscribe(score -> highscoresList.add(score));
-		return highscoresList;
+		Stream<ScoreEntry> highscores = highscoreService.getSortedHighscores(1);
+		List<ScoreEntry> highscoresList = highscores.collect(Collectors.toList());
+		assertEquals(3, highscoresList.size());
+		assertEquals(30, highscoresList.stream().findFirst().get().getScore());
+		assertEquals(3, highscoresList.stream().findFirst().get().getUser());
+		assertEquals(15, highscoresList.stream().skip(1).findFirst().get().getScore());
+		assertEquals(2, highscoresList.stream().skip(1).findFirst().get().getUser());
+		assertEquals(4, highscoresList.stream().skip(2).findFirst().get().getScore());
+		assertEquals(4, highscoresList.stream().skip(2).findFirst().get().getUser());
+		
+		highscoreService.update(1, 4, 44);
+		
+		highscores = highscoreService.getSortedHighscores(1);
+		highscoresList = highscores.collect(Collectors.toList());
+		assertEquals(3, highscoresList.size());
+		assertEquals(44, highscoresList.stream().findFirst().get().getScore());
+		assertEquals(4, highscoresList.stream().findFirst().get().getUser());
+		assertEquals(30, highscoresList.stream().skip(1).findFirst().get().getScore());
+		assertEquals(3, highscoresList.stream().skip(1).findFirst().get().getUser());
+		assertEquals(15, highscoresList.stream().skip(2).findFirst().get().getScore());
+		assertEquals(2, highscoresList.stream().skip(2).findFirst().get().getUser());
 	}
 }

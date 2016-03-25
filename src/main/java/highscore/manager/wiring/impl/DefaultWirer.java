@@ -24,11 +24,13 @@ import highscore.manager.service.impl.EncodedSessionKeyServiceImpl;
 import highscore.manager.service.impl.HighscoreServiceImpl;
 import highscore.manager.service.impl.HighscoresFormatterServiceImpl;
 import highscore.manager.service.impl.LockStripingHighscoreServiceImpl;
+import highscore.manager.service.impl.ReactiveHighscoreServiceImpl;
 import highscore.manager.service.impl.SessionManagementServiceImpl;
 import highscore.manager.wiring.Wirer;
 
 public class DefaultWirer implements Wirer<HighscoreManagerHttpServer> {
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public HighscoreManagerHttpServer wire(Map<String, String> configuration) {
 		String httpServerHost = configuration.get("http.server.host");
@@ -38,16 +40,21 @@ public class DefaultWirer implements Wirer<HighscoreManagerHttpServer> {
 		System.out.println("cpuCount set to " + cpuCount);
 		String httpServerResponseEncoding = configuration.get("http.server.response.encoding");
 		int highscoresMaxPerLevel = Integer.parseInt(configuration.get("highscores.max.per.level"));
-		boolean highscoresUseLockStriping = Boolean.parseBoolean(configuration.get("highscores.use.lock.striping"));
+		String highscoresServiceImplementation = configuration.get("highscores.service.implementation");
 		int sessionTimeoutMinutes = Integer.parseInt(configuration.get("session.timeout.minutes"));
 		
 		
 		IntHashMapFactory highscoreServiceIntHashMapFactory = new CappedIntHashMapFactory((byte)highscoresMaxPerLevel);
 
 		HighscoreService highscoreService;
-		if(highscoresUseLockStriping) {
+		if("LockStriping".equals(highscoresServiceImplementation)) {
 			highscoreService = new LockStripingHighscoreServiceImpl(highscoreServiceIntHashMapFactory, cpuCount);
+		} else if("GloballyLocking".equals(highscoresServiceImplementation)) {
+			highscoreService = new HighscoreServiceImpl(highscoreServiceIntHashMapFactory);
+		} else if("Reactive".equals(highscoresServiceImplementation)) {
+			highscoreService = new ReactiveHighscoreServiceImpl((byte) highscoresMaxPerLevel); 
 		} else {
+			System.out.println("Don't understand config highscores.service.implementation=" + highscoresServiceImplementation);
 			highscoreService = new HighscoreServiceImpl(highscoreServiceIntHashMapFactory);
 		}
 		System.out.println("HighscoreService implementation is " + highscoreService.getClass().getSimpleName());

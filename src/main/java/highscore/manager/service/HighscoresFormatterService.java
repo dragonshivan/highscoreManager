@@ -1,7 +1,6 @@
 package highscore.manager.service;
 
-@FunctionalInterface
-public interface HighscoresFormatterService<T> {
+public interface HighscoresFormatterService {
 
-	String format(T highscores);
+	String format(Object highscores);
 }

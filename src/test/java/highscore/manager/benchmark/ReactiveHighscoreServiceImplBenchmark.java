@@ -6,9 +6,12 @@ import static highscore.manager.benchmark.BenchmarkUtils.randomConcurrentInt;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import highscore.manager.service.HighscoreService;
 import highscore.manager.service.impl.ReactiveHighscoreServiceImpl;
+import highscore.manager.service.impl.ReactiveHighscoreServiceImpl.ScoreEntry;
 
 public class ReactiveHighscoreServiceImplBenchmark {
 
@@ -17,20 +20,20 @@ public class ReactiveHighscoreServiceImplBenchmark {
 		//16 threads
 		System.out.println("ReactiveHighscoreServiceImpl");
 		
-		//350	3.9
+		//256 2.4
 		readAndUpdateBenchmark(1_000_000);
 		
-		//465	4.1
+		//290 2.3
 		readReadAndUpdateBenchmark(1_000_000);
 	}
 	
 	private static void readAndUpdateBenchmark(int repetitions) throws InterruptedException {
 		System.gc();
-		HighscoreService<?> service = new ReactiveHighscoreServiceImpl((byte)15);
+		HighscoreService<Stream<ScoreEntry>> service = new ReactiveHighscoreServiceImpl((byte)15);
 		ExecutorService executorService = Executors.newFixedThreadPool(16);
 		long st = System.currentTimeMillis();
 		for(int i = 0; i < repetitions; i++) {
-			executorService.execute(() -> service.getSortedHighscores(randomConcurrentInt()));
+			executorService.execute(() -> service.getSortedHighscores(randomConcurrentInt()).collect(Collectors.toList()));
 			executorService.execute(() -> service.update(randomConcurrentInt(), randomConcurrentInt(), randomConcurrentInt()));
 		}
 		executorService.shutdown();
@@ -43,12 +46,12 @@ public class ReactiveHighscoreServiceImplBenchmark {
 	
 	private static void readReadAndUpdateBenchmark(int repetitions) throws InterruptedException {
 		System.gc();
-		HighscoreService<?> service = new ReactiveHighscoreServiceImpl((byte)15);
+		HighscoreService<Stream<ScoreEntry>> service = new ReactiveHighscoreServiceImpl((byte)15);
 		ExecutorService executorService = Executors.newFixedThreadPool(16);
 		long st = System.currentTimeMillis();
 		for(int i = 0; i < repetitions; i++) {
-			executorService.execute(() -> service.getSortedHighscores(randomConcurrentInt()));
-			executorService.execute(() -> service.getSortedHighscores(randomConcurrentInt()));
+			executorService.execute(() -> service.getSortedHighscores(randomConcurrentInt()).collect(Collectors.toList()));
+			executorService.execute(() -> service.getSortedHighscores(randomConcurrentInt()).collect(Collectors.toList()));
 			executorService.execute(() -> service.update(randomConcurrentInt(), randomConcurrentInt(), randomConcurrentInt()));
 		}
 		executorService.shutdown();

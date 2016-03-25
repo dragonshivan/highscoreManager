@@ -12,12 +12,12 @@ public class HighscoreReportControllerImpl<T> extends AbstractController {
 	private static final String LEVEL_ID_ATTR = HighscoreReportControllerImpl.class.getSimpleName() + "_" + "LEVEL_ID_ATTR";
 	
 	private final HighscoreService<T> highscoreService;
-	private final HighscoresFormatterService<T> highscoresFormatterService;
+	private final HighscoresFormatterService highscoresFormatterService;
 
 	public HighscoreReportControllerImpl(Charset responseEncoding,
 			HttpMethod matchingHttpMethod, String matchingRequestURIRegEx,
 			HighscoreService<T> highscoreService,
-			HighscoresFormatterService<T> highscoresFormatterService) {
+			HighscoresFormatterService highscoresFormatterService) {
 		super(responseEncoding, matchingHttpMethod, matchingRequestURIRegEx);
 		this.highscoreService = highscoreService;
 		this.highscoresFormatterService = highscoresFormatterService;

@@ -1,0 +1,51 @@
+Start no pauses
+samples: 57400
+
+
+VM args:
+-Xmx2g
+-XX:+UseCompressedOops
+-XX:+UseConcMarkSweepGC
+-Dfile.encoding=Cp1252
+
+
+Using default config file
+This file can be overriden by creating a new file in the same folder as the jar, called highscoreManager.conf
+	http.server.host = localhost
+	http.server.port = 8123
+	http.server.url.root = /
+	http.server.response.encoding = UTF-8
+	highscores.max.per.level = 15
+	highscores.service.implementation = Reactive
+	session.timeout.minutes = 10
+cpuCount set to 8
+HighscoreService implementation is ReactiveHighscoreServiceImpl
+
+Req/s: 1700
+Heap: 72 mb
+Stats: Highscore stats: levels=22643 user/highscore tuples=25763 | Sessions stats: generations=2 sessions=1400
+
+
+VM args:
+-Xmx2g
+-XX:+UseCompressedOops
+-XX:+UseConcMarkSweepGC
+-Dfile.encoding=Cp1252
+
+Using default config file
+This file can be overriden by creating a new file in the same folder as the jar, called highscoreManager.conf
+	http.server.host = localhost
+	http.server.port = 8123
+	http.server.url.root = /
+	http.server.response.encoding = UTF-8
+	highscores.max.per.level = 15
+	highscores.service.implementation = LockStriping
+	session.timeout.minutes = 10
+cpuCount set to 8
+HighscoreService implementation is LockStripingHighscoreServiceImpl
+
+started on localhost/127.0.0.1:8123/
+
+Req/s: 1700
+Heap: 
+Stats: Highscore stats: levels=22696 user/highscore tuples=25787 | Sessions stats: generations=1 sessions=1400

@@ -11,13 +11,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	</properties>
 
 	<dependencies>
-
-		<!-- for reactive implementations -->
-		<dependency>
-	        <groupId>io.reactivex</groupId>
-	        <artifactId>rxjava</artifactId>
-	        <version>1.0.0-rc.10</version>
-	    </dependency>
 	
 		<!-- for basic tests: -->
 		<dependency>

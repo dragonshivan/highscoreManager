@@ -17,10 +17,10 @@ public class HighscoreServiceImplBenchmark {
 		//16 threads
 		System.out.println("HighscoreServiceImplBenchmark");
 		
-		//350	3.9
+		//270	3.3
 		readAndUpdateBenchmark(1_000_000);
 		
-		//465	4.1
+		//345	2.9
 		readReadAndUpdateBenchmark(1_000_000);
 	}
 	

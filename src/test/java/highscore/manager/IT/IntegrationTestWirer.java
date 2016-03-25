@@ -44,7 +44,7 @@ public class IntegrationTestWirer implements Wirer<HighscoreManagerHttpServer> {
 		Controller loginController = new LoginControllerImpl(charset, HttpMethod.GET, ".*/[0-9]{0,10}/login", sessionManagementService);
 		Controller highscoreUpdateController = new HighscoreUpdateControllerImpl(charset, HttpMethod.POST, ".*/[0-9]{0,10}/score\\?sessionkey=[A-Z0-9]{6}",
 				highscoreService, sessionManagementService);
-		HighscoresFormatterService<IntHeap> highscoresFormatterService = new HighscoresFormatterServiceImpl("=", ",");
+		HighscoresFormatterService highscoresFormatterService = new HighscoresFormatterServiceImpl("=", ",");
 		Controller highscoreReportController = new HighscoreReportControllerImpl<IntHeap>(charset, HttpMethod.GET, ".*/[0-9]{0,10}/highscorelist", 
 				highscoreService, highscoresFormatterService);
 		
