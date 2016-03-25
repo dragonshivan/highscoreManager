@@ -47,5 +47,5 @@ HighscoreService implementation is LockStripingHighscoreServiceImpl
 started on localhost/127.0.0.1:8123/
 
 Req/s: 1700
-Heap: 
+Heap: 78 Mb
 Stats: Highscore stats: levels=22696 user/highscore tuples=25787 | Sessions stats: generations=1 sessions=1400

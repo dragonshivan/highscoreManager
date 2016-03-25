@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.StampedLock;
 
 import highscore.manager.service.EncodedSessionKeyService;
@@ -13,7 +15,7 @@ import highscore.manager.service.SessionManagementService;
 import highscore.manager.service.datastructure.IntHashMap;
 import highscore.manager.service.datastructure.IntHashMapFactory;
 
-public class SessionManagementServiceImpl implements SessionManagementService {
+public class ReactiveSessionManagementServiceImpl implements SessionManagementService {
 	
 	private static final byte SECONDS_TO_MINUTES_DIVISOR = 60;
 	
@@ -22,15 +24,12 @@ public class SessionManagementServiceImpl implements SessionManagementService {
 	private final EncodedSessionKeyService encodedSessionKeyService;
 	private final int sessionTimeoutMinutes;
 	private final int serverStartTimeAsMinutesFromEpoch;
-	private final IntHashMapFactory intHashMapFactory;
 	
-	private final Map<Integer, IntHashMap> sessionsPerStartTimeAsMinutesFromServerStart;
-	
-	private final StampedLock globalLock;
+	private final Map<Integer, Map<Integer, Integer>> generations;
 	
 	private int lastSessionCleanUpAsMinutesFromServerStart;
 
-	public SessionManagementServiceImpl(EncodedSessionKeyService encodedSessionKeyService, 
+	public ReactiveSessionManagementServiceImpl(EncodedSessionKeyService encodedSessionKeyService, 
 			int sessionTimeoutMinutes,
 			LocalDateTime serverStartTime,
 			IntHashMapFactory intHashMapFactory) {
@@ -38,25 +37,25 @@ public class SessionManagementServiceImpl implements SessionManagementService {
 		this.sessionTimeoutMinutes = sessionTimeoutMinutes;
 		serverStartTimeAsMinutesFromEpoch = (int) (serverStartTime.toEpochSecond(ZONE_OFFSET) / SECONDS_TO_MINUTES_DIVISOR);
 		lastSessionCleanUpAsMinutesFromServerStart = 0;
-		this.intHashMapFactory = intHashMapFactory;
-		sessionsPerStartTimeAsMinutesFromServerStart = new LinkedHashMap<>();
-		globalLock = new StampedLock();
+		generations = new ConcurrentHashMap<>();
 	}
 
 	@Override
 	public char[] getNewSessionId(int userId) {
-		
 		int encodedSessionKey = encodedSessionKeyService.generateEncoded();
-		IntHashMap sessionsGeneration;
 		
-		long globalLockStamp = globalLock.writeLock();		
-		try {			
-			removeExpiredSessionsIfAny();
-			sessionsGeneration = getOrCreateCurrentSessionGeneration();
-			sessionsGeneration.put(encodedSessionKey, userId);
-		} finally {
-			globalLock.unlockWrite(globalLockStamp);
-		}
+		generations.compute(getMinutesFromServerStart(), (generationTime, latestGeneration) -> {
+			if(latestGeneration == null) {
+				Map<Integer, Integer> newGeneration = new ConcurrentHashMap<>();
+				newGeneration.put(encodedSessionKey, userId);
+				return newGeneration;
+			} else {
+				latestGeneration.put(encodedSessionKey, userId);
+				return latestGeneration;
+			}
+		});
+		
+		//TODO remove expired generations
 		
 		return encodedSessionKeyService.decode(encodedSessionKey);
 	}
@@ -69,14 +68,7 @@ public class SessionManagementServiceImpl implements SessionManagementService {
 			return SessionManagementService.SYNTACTICALLY_INVALID_SESSION_KEY;
 		}
 		
-		int userId;
-				
-		long globalLockStamp = globalLock.readLock();
-		try {
-			userId = getAssociatedUserIdFromNonexpiredSession(encodedSessionKey);
-		} finally {
-			globalLock.unlockRead(globalLockStamp);
-		}
+		int userId = getAssociatedUserIdFromNonexpiredSession(encodedSessionKey);
 		
 		if(userId < 0) {
 			return SessionManagementService.SESSION_NOT_FOUND;
@@ -87,18 +79,12 @@ public class SessionManagementServiceImpl implements SessionManagementService {
 	
 	@Override
 	public SessionStats getStats() {
-		long lockStamp = globalLock.readLock();
-		try {
-			int generationsCount = sessionsPerStartTimeAsMinutesFromServerStart.size();
-			int sessionsCount = 0;
-			for(IntHashMap sessoinsGeneration:sessionsPerStartTimeAsMinutesFromServerStart.values()) {
-				sessionsCount += sessoinsGeneration.getSize();
-			}
-			return new  SessionStats(generationsCount, sessionsCount);
-		} finally {
-			globalLock.unlockRead(lockStamp);
+		int generationsCount = generations.size();
+		int sessionsCount = 0;
+		for(Map<?, ?> sessoinsGeneration:generations.values()) {
+			sessionsCount += sessoinsGeneration.size();
 		}
-		
+		return new  SessionStats(generationsCount, sessionsCount);
 	}
 	
 	protected int getMinutesFromServerStart() {
@@ -112,18 +98,18 @@ public class SessionManagementServiceImpl implements SessionManagementService {
 	
 	private IntHashMap getOrCreateCurrentSessionGeneration() {
 		int minutesSinceServerStart = getMinutesFromServerStart();
-		IntHashMap sessionsGeneration = sessionsPerStartTimeAsMinutesFromServerStart.get(minutesSinceServerStart);
+		IntHashMap sessionsGeneration = generations.get(minutesSinceServerStart);
 		if(sessionsGeneration == null) {
 			System.out.println("Creating new generation of sessions for minute : " + minutesSinceServerStart);
 			sessionsGeneration = intHashMapFactory.getIntHashMap();
-			sessionsPerStartTimeAsMinutesFromServerStart.put(minutesSinceServerStart, sessionsGeneration);
+			generations.put(minutesSinceServerStart, sessionsGeneration);
 		}
 		return sessionsGeneration;
 	}
 	
 	private int getAssociatedUserIdFromNonexpiredSession(int encodedSessionKey) {
 		int userId = IntHashMap.NOT_FOUND;
-		for(Entry<Integer, IntHashMap> sessionsGenerationEntry:sessionsPerStartTimeAsMinutesFromServerStart.entrySet()) {
+		for(Entry<Integer, IntHashMap> sessionsGenerationEntry:generations.entrySet()) {
 			int sessionStartTimeMinutesFromServerStart = sessionsGenerationEntry.getKey();
 			if(getSessionLifeMinutes(sessionStartTimeMinutesFromServerStart) > sessionTimeoutMinutes) {
 				continue;
@@ -141,7 +127,7 @@ public class SessionManagementServiceImpl implements SessionManagementService {
 		if(getMinutesFromServerStart() - lastSessionCleanUpAsMinutesFromServerStart < 1) {
 			return;
 		}
-		Iterator<Map.Entry<Integer, IntHashMap>> it = sessionsPerStartTimeAsMinutesFromServerStart.entrySet().iterator();
+		Iterator<Map.Entry<Integer, IntHashMap>> it = generations.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<Integer, IntHashMap> entry = it.next();
 		    int sessionStartTimeMinutesFromServerStart = entry.getKey();
