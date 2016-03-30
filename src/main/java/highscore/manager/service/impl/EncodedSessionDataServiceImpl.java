@@ -2,6 +2,7 @@ package highscore.manager.service.impl;
 
 import highscore.manager.service.EncodedSessionDataService;
 
+@Deprecated
 public class EncodedSessionDataServiceImpl implements EncodedSessionDataService {
 
 	private static final byte INT_BITS_COUNT = 32;

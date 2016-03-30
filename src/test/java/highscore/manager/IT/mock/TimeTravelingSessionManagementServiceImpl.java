@@ -2,7 +2,6 @@ package highscore.manager.IT.mock;
 
 import java.time.LocalDateTime;
 
-import highscore.manager.service.EncodedSessionDataService;
 import highscore.manager.service.EncodedSessionKeyService;
 import highscore.manager.service.datastructure.IntHashMapFactory;
 import highscore.manager.service.impl.SessionManagementServiceImpl;
@@ -12,7 +11,7 @@ public class TimeTravelingSessionManagementServiceImpl extends SessionManagement
 	private int minutesInFuture ;
 	
 	public TimeTravelingSessionManagementServiceImpl(
-			EncodedSessionKeyService encodedSessionKeyService, EncodedSessionDataService encodedSessionDataService,
+			EncodedSessionKeyService encodedSessionKeyService, 
 			int sessionTimeoutMinutes, LocalDateTime serverStartTime,
 			IntHashMapFactory intHashMapFactory) {
 		super(encodedSessionKeyService, sessionTimeoutMinutes, serverStartTime,

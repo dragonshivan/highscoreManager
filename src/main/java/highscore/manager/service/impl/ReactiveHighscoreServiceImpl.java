@@ -22,35 +22,51 @@ public class ReactiveHighscoreServiceImpl implements HighscoreService<Stream<Sco
 
 	@Override
 	public void update(int level, int user, int score) {
-		scores.compute(level, (existingLevel, oldScoresOfLevel) -> {
-			if(oldScoresOfLevel == null) {
-				List<ScoreEntry> newScoresOfLevel = new CopyOnWriteArrayList<>();
-				newScoresOfLevel.add(new ScoreEntry(user, score));
-				return newScoresOfLevel;
+		scores.compute(level, (existingLevel, scoresOfLevel) -> {
+			if(scoresOfLevel == null) {
+				return newWithSingleEntry(user, score);
 			} else {
-				ScoreEntry newScoreEntry = new ScoreEntry(user, score);
-				int oldScoreIndex = oldScoresOfLevel.indexOf(newScoreEntry);
-				if(oldScoreIndex != -1) {
-					ScoreEntry oldScoreEntry = oldScoresOfLevel.get(oldScoreIndex);
-					if(newScoreEntry.getScore() > oldScoreEntry.getScore()) {
-						oldScoresOfLevel.set(oldScoreIndex, newScoreEntry);
-					}
-				} else {
-					if(oldScoresOfLevel.size() < maxHighscoresPerLevel) {
-						oldScoresOfLevel.add(newScoreEntry);
-					} else {
-						ScoreEntry lowestScoreEntry = getLowest(oldScoresOfLevel);
-						if(newScoreEntry.getScore() > lowestScoreEntry.getScore()) {
-							oldScoresOfLevel.remove(lowestScoreEntry);
-							oldScoresOfLevel.add(newScoreEntry);
-						}
-					}
-				}
-				return oldScoresOfLevel;
+				updateExisting(user, score, scoresOfLevel);
+				return scoresOfLevel;
 			}
 		});
 	}
-
+	
+	private List<ScoreEntry> newWithSingleEntry(int user, int score) {
+		List<ScoreEntry> newScoresOfLevel = new CopyOnWriteArrayList<>();
+		newScoresOfLevel.add(new ScoreEntry(user, score));
+		return newScoresOfLevel;
+	}
+	
+	private void updateExisting(int user, int score, List<ScoreEntry> scoresOfLevel) {
+		ScoreEntry newScoreEntry = new ScoreEntry(user, score);
+		int oldScoreIndex = scoresOfLevel.indexOf(newScoreEntry);
+		if(oldScoreIndex != -1) {
+			replaceScore(scoresOfLevel, oldScoreIndex, newScoreEntry);
+		} else {
+			if(scoresOfLevel.size() < maxHighscoresPerLevel) {
+				scoresOfLevel.add(newScoreEntry);
+			} else {
+				ScoreEntry lowestScoreEntry = getLowest(scoresOfLevel);
+				addNewAndRemoveLowest(scoresOfLevel, newScoreEntry, lowestScoreEntry);
+			}
+		}
+	}
+	
+	private void replaceScore(List<ScoreEntry> scoresOfLevel, int oldScoreIndex, ScoreEntry newScoreEntry) {
+		ScoreEntry oldScoreEntry = scoresOfLevel.get(oldScoreIndex);
+		if(newScoreEntry.getScore() > oldScoreEntry.getScore()) {
+			scoresOfLevel.set(oldScoreIndex, newScoreEntry);
+		}
+	}
+	
+	private void addNewAndRemoveLowest(List<ScoreEntry> scoresOfLevel, ScoreEntry newScoreEntry, ScoreEntry lowestScoreEntry) {
+		if(newScoreEntry.getScore() > lowestScoreEntry.getScore()) {
+			scoresOfLevel.remove(lowestScoreEntry);
+			scoresOfLevel.add(newScoreEntry);
+		}
+	}
+ 
 	@Override
 	public Stream<ScoreEntry> getSortedHighscores(int level) {
 		List<ScoreEntry> scoresOfLevel = scores.get(level);

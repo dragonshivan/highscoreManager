@@ -1,5 +1,6 @@
 package highscore.manager.service;
 
+@Deprecated
 public interface EncodedSessionDataService {
 
 	public long encode(int userId, int sessionStartTimeMinutesFromServerStart);

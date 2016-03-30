@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import highscore.manager.IT.mock.TimeTravelingSessionManagementServiceImpl;
-import highscore.manager.service.EncodedSessionDataService;
 import highscore.manager.service.EncodedSessionKeyService;
 import highscore.manager.service.SessionManagementService;
 import highscore.manager.service.datastructure.impl.ExpandableIntHashMapFactory;
@@ -21,10 +20,9 @@ public class SessionManagementServiceImplTest {
 	@Before
 	public void init() {
 		EncodedSessionKeyService encodedSessionKeyService = new EncodedSessionKeyServiceImpl();
-		EncodedSessionDataService encodedSessionDataService = new EncodedSessionDataServiceImpl();
 		sessionManagementService = 
 				new TimeTravelingSessionManagementServiceImpl(encodedSessionKeyService, 
-						encodedSessionDataService, 10, LocalDateTime.now(), new ExpandableIntHashMapFactory(10, 8));
+						10, LocalDateTime.now(), new ExpandableIntHashMapFactory(10, 8));
 	}
 	
 	@Test

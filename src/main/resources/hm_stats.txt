@@ -1,5 +1,0 @@
-Lock striping
-Highscore stats: levels=58127 user/highscore tuples=87084 | Sessions stats: generations=1 sessions=4498
-
-Global locking
-Highscore stats: levels=57988 user/highscore tuples=86751 | Sessions stats: generations=1 sessions=4497
